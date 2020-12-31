@@ -1,20 +1,24 @@
+from itertools import combinations
+import os
+
 from fcapy import Context, Concept
 from fcapy.psychology.typicality import typicality_avg
 from fcapy.similarity.objects import smc, jaccard, rosch
 from fcapy.utils import iterator_mean
-from fcapy_experiments.utils import text_to_filename
 import pandas as pd
 import plotly.express as px
 
-from itertools import combinations
-import os
+from fcapy_experiments.utils import text_to_filename, fig_to_file
 
 
 def k_values_or_until_differs(iterator, k):
     max_idx = len(iterator) - 1
 
+    if k == 0:
+        return []
+
     for idx in range(len(iterator)):
-        if idx < k or (idx < max_idx and iterator[idx] == iterator[idx + 1]):
+        if idx + 1 < k or (idx < max_idx and iterator[idx] == iterator[idx + 1]):
             yield iterator[idx]
         else:
             yield iterator[idx]
@@ -57,13 +61,13 @@ def experiment_top_k_similarity(dataset,
         raise ValueError('Extent or Intent must be provided!')
 
     if k_range is None:
-        k_range = range(len(concept.extent))
+        k_range = range(1, len(concept.extent))
 
     results = []
 
     for sim1, sim2 in combinations(similarity_functions, 2):
         sim1_order = sorted(concept.extent,
-                            key=lambda x: typicality_avg(
+                            key=lambda x: typicality(
                                 next(context.filter([x])), context.filter(concept.extent), sim1),
                             reverse=True)
 
@@ -76,7 +80,7 @@ def experiment_top_k_similarity(dataset,
 
         for k in k_range:
             results.append([k, top_k_similarity(
-                sim1_order, sim2_order, k, smc, context), label])
+                sim1_order, sim2_order, k, jaccard, context), label])
 
     # Add ground truth comparation
     if ground_truth is not None:
@@ -93,7 +97,7 @@ def experiment_top_k_similarity(dataset,
 
             for k in k_range:
                 results.append([k, top_k_similarity(
-                    sim_order, gt_order, k, smc, context), label])
+                    sim_order, gt_order, k, jaccard, context), label])
 
     return pd.DataFrame(results, columns=['k', 'top_k_similarity', 'label'])
 
@@ -103,7 +107,7 @@ def plot_top_k_similarity(df, title, output_dir=None):
         'label': 'Legend'}, line_dash='label', title=title)
 
     if output_dir:
-        fig.write_image(os.path.join(
-            output_dir, f"{plot_top_k_similarity.__name__}_{text_to_filename(title)}.pdf"))
+        output_filename = f"{plot_top_k_similarity.__name__}_{text_to_filename(title)}"
 
+        fig_to_file(fig, output_dir, output_filename)
     return fig

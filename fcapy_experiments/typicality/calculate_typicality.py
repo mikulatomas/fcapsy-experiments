@@ -1,11 +1,12 @@
+import os
+
 from fcapy import Context, Concept
 from fcapy.psychology.typicality import typicality_avg
 from fcapy.similarity.objects import smc, jaccard, rosch
 import pandas as pd
 import plotly.figure_factory as ff
-from fcapy_experiments.utils import text_to_filename
-
-import os
+import plotly.express as px
+from fcapy_experiments.utils import text_to_filename, fig_to_file
 
 
 def experiment_calculate_typicality(dataset,
@@ -79,7 +80,47 @@ def plot_calculate_typicality(df, title, decimals=3, width=None, output_dir=None
     fig.layout.width = width
 
     if output_dir:
-        fig.write_image(os.path.join(
-            output_dir, f"{plot_calculate_typicality.__name__}_{text_to_filename(title)}.pdf"))
+        output_filename = f"{plot_calculate_typicality.__name__}_{text_to_filename(title)}"
+
+        fig_to_file(fig, output_dir, output_filename)
+
+    return fig
+
+
+def plot_typicality_correlation(df, title, index_title="", decimals=3, width=None, output_dir=None):
+    if width is None:
+        width = len(df.columns) * 100
+
+    df = df.round(decimals=decimals)
+
+    fig = ff.create_table(df, index=True, index_title=index_title)
+    fig.layout.width = width
+    fig.update_layout(
+        title={
+            'text': title,
+            'x': 0.01,
+            'xanchor': 'left'},
+        margin={'t': 70})
+
+    fig.layout.width = width
+
+    if output_dir:
+        output_filename = f"{plot_typicality_correlation.__name__}_{text_to_filename(title)}"
+
+        if index_title != "":
+            output_filename = f"{output_filename}_{index_title}"
+
+        fig_to_file(fig, output_dir, output_filename)
+
+    return fig
+
+
+def plot_boxplot_typicality(df, title, output_dir=None):
+    fig = px.box(df, y=df.columns, title=title)
+
+    if output_dir:
+        output_filename = f"{plot_boxplot_typicality.__name__}_{text_to_filename(title)}"
+
+        fig_to_file(fig, output_dir, output_filename)
 
     return fig
