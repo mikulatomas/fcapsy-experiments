@@ -12,7 +12,7 @@ from fcapy_experiments.utils import text_to_filename, fig_to_file
 def experiment_calculate_typicality(dataset,
                                     extent=None,
                                     intent=None,
-                                    ground_truth=None,
+                                    ground_truths=None,
                                     typicality=typicality_avg,
                                     similarity_functions=[smc, jaccard, rosch]):
     context = Context.from_pandas(dataset)
@@ -40,15 +40,16 @@ def experiment_calculate_typicality(dataset,
         df.loc[obj] = [typicality(item, rows, similarity_function)
                        for similarity_function in similarity_functions]
 
-    if ground_truth is not None:
-        before_join = set(df.columns)
+    if ground_truths is not None:
+        for name, values in ground_truths.items():
+            before_join = set(df.columns)
 
-        df = df.join(ground_truth[ground_truth.columns[0]])
+            df = df.join(values[values.columns[0]])
 
-        human_rating_column = list(
-            before_join.symmetric_difference(set(df.columns)))[0]
+            human_rating_column = list(
+                before_join.symmetric_difference(set(df.columns)))[0]
 
-        df = df.rename(columns={human_rating_column: "GT"})
+            df = df.rename(columns={human_rating_column: name})
 
     return df
 
