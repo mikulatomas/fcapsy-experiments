@@ -45,8 +45,8 @@ def experiment_top_k_similarity(dataset,
                                 intent=None,
                                 k_range=None,
                                 ground_truth=None,
-                                typicality=typicality_avg,
-                                similarity_functions=[smc, jaccard, rosch]):
+                                typicality_metrics={
+                                    typicality_avg: [smc, jaccard, rosch]}):
     context = Context.from_pandas(dataset)
 
     if extent is not None:
@@ -65,39 +65,41 @@ def experiment_top_k_similarity(dataset,
 
     results = []
 
-    for sim1, sim2 in combinations(similarity_functions, 2):
-        sim1_order = sorted(concept.extent,
-                            key=lambda x: typicality(
-                                next(context.filter([x])), context.filter(concept.extent), sim1),
-                            reverse=True)
+    for typicality, similarity_functions in typicality_metrics.items():
+        for sim1, sim2 in combinations(similarity_functions, 2):
+            sim1_order = sorted(concept.extent,
+                                key=lambda x: typicality(
+                                    x, concept, context, sim1),
+                                reverse=True)
 
-        sim2_order = sorted(concept.extent,
-                            key=lambda x: typicality_avg(
-                                next(context.filter([x])), context.filter(concept.extent), sim2),
-                            reverse=True)
+            sim2_order = sorted(concept.extent,
+                                key=lambda x: typicality(
+                                    x, concept, context, sim2),
+                                reverse=True)
 
-        label = f"{sim1.short_name}-{sim2.short_name}"
-
-        for k in k_range:
-            results.append([k, top_k_similarity(
-                sim1_order, sim2_order, k, jaccard, context), label])
-
-    # Add ground truth comparation
-    if ground_truth is not None:
-        for sim in similarity_functions:
-            sim_order = sorted(concept.extent,
-                               key=lambda x: typicality_avg(
-                                   next(context.filter([x])), context.filter(concept.extent), sim),
-                               reverse=True)
-
-            gt_order = list(ground_truth.sort_values(
-                ground_truth.columns[0], ascending=False).index)
-
-            label = f"GT-{sim.short_name}"
+            label = f"{typicality.short_name} {sim1.short_name}-{sim2.short_name}"
 
             for k in k_range:
                 results.append([k, top_k_similarity(
-                    sim_order, gt_order, k, jaccard, context), label])
+                    sim1_order, sim2_order, k, jaccard, context), label])
+
+    # Add ground truth comparation
+    if ground_truth is not None:
+        for typicality, similarity_functions in typicality_metrics.items():
+            for sim in similarity_functions:
+                sim_order = sorted(concept.extent,
+                                   key=lambda x: typicality(
+                                       x, concept, context, sim),
+                                   reverse=True)
+
+                gt_order = list(ground_truth.sort_values(
+                    ground_truth.columns[0], ascending=False).index)
+
+                label = f"{typicality.short_name} {sim.short_name}-GT"
+
+                for k in k_range:
+                    results.append([k, top_k_similarity(
+                        sim_order, gt_order, k, jaccard, context), label])
 
     return pd.DataFrame(results, columns=['k', 'top_k_similarity', 'label'])
 

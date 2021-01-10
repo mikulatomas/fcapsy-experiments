@@ -13,8 +13,8 @@ def experiment_calculate_typicality(dataset,
                                     extent=None,
                                     intent=None,
                                     ground_truths=None,
-                                    typicality=typicality_avg,
-                                    similarity_functions=[smc, jaccard, rosch]):
+                                    typicality_metrics={
+                                        typicality_avg: [smc, jaccard, rosch]}):
     context = Context.from_pandas(dataset)
 
     if extent is not None:
@@ -28,17 +28,25 @@ def experiment_calculate_typicality(dataset,
     else:
         raise ValueError('Extent or Intent must be provided!')
 
+    columns = []
+
+    for typicality, similarity_functions in typicality_metrics.items():
+        columns.extend([
+            f"{typicality.short_name}({similarity_function.short_name})" for similarity_function in similarity_functions])
+
     df = pd.DataFrame(
-        columns=[
-            similarity_function.short_name for similarity_function in similarity_functions],
+        columns=columns,
         index=concept.extent.members(),
         dtype=float)
 
-    rows = tuple(context.filter(concept.extent))
+    for obj in concept.extent:
+        row = []
 
-    for obj, item in zip(concept.extent, rows):
-        df.loc[obj] = [typicality(item, rows, similarity_function)
-                       for similarity_function in similarity_functions]
+        for typicality, similarity_functions in typicality_metrics.items():
+            row.extend([typicality(obj, concept, context, similarity_function)
+                        for similarity_function in similarity_functions])
+
+        df.loc[obj] = row
 
     if ground_truths is not None:
         for name, values in ground_truths.items():
@@ -67,7 +75,7 @@ def plot_calculate_typicality(df, title, decimals=3, width=None, output_dir=None
     final_table = final_table.reset_index().drop('index', axis=1)
 
     if width is None:
-        width = len(df.columns) * 250
+        width = len(df.columns) * 230
 
     fig = ff.create_table(final_table)
     fig.layout.width = width
@@ -90,7 +98,7 @@ def plot_calculate_typicality(df, title, decimals=3, width=None, output_dir=None
 
 def plot_typicality_correlation(df, title, index_title="", decimals=3, width=None, output_dir=None):
     if width is None:
-        width = len(df.columns) * 100
+        width = len(df.columns) * 150
 
     df = df.round(decimals=decimals)
 
