@@ -8,9 +8,10 @@ def text_to_filename(text):
     return re.sub(r" ", "_", first_replacement)
 
 
-def fig_to_file(fig, output_dir, output_filename):
-    fig.write_image(os.path.join(
-        output_dir, f"{output_filename}.pdf"), engine="kaleido")
+def fig_to_file(fig, output_dir, output_filename, pdf=False):
+    if pdf:
+        fig.write_image(os.path.join(
+            output_dir, f"{output_filename}.pdf"), engine="kaleido")
 
     fig.write_image(os.path.join(
         output_dir, f"{output_filename}.png"), scale=3, engine="kaleido")

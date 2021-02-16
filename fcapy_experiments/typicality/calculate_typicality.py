@@ -9,25 +9,11 @@ import plotly.express as px
 from fcapy_experiments.utils import text_to_filename, fig_to_file
 
 
-def experiment_calculate_typicality(dataset,
-                                    extent=None,
-                                    intent=None,
-                                    ground_truths=None,
-                                    typicality_metrics={
-                                        typicality_avg: [smc, jaccard, rosch]}):
-    context = Context.from_pandas(dataset)
-
-    if extent is not None:
-        concept = Concept.from_extent(extent, context)
-        if set(concept.extent) != set(extent):
-            raise ValueError("Extent does not form formal concept!")
-    elif intent is not None:
-        concept = Concept.from_intent(intent, context)
-        if set(concept.intent) != set(intent):
-            raise ValueError("Intent does not form formal concept!")
-    else:
-        raise ValueError('Extent or Intent must be provided!')
-
+def exp_concept_typicality(concept,
+                           context,
+                           ground_truths=None,
+                           typicality_metrics={
+                               typicality_avg: [smc, jaccard, rosch]}):
     columns = []
 
     for typicality, similarity_functions in typicality_metrics.items():
@@ -62,7 +48,93 @@ def experiment_calculate_typicality(dataset,
     return df
 
 
-def plot_calculate_typicality(df, title, decimals=3, width=None, output_dir=None):
+def exp_corr_across_concepts(concepts,
+                             context,
+                             corr_method,
+                             corr_to,
+                             ground_truths=None,
+                             typicality_metrics={
+                                 typicality_avg: [smc, jaccard, rosch]},
+                             ):
+
+    typicalities = [exp_concept_typicality(
+        concept, context, gt, typicality_metrics) for concept, gt in zip(concepts, ground_truths)]
+
+    correlations = []
+    correlations_index = []
+
+    for concept, typicality in zip(concepts, typicalities):
+        correlation = typicality.corr(method=corr_method)
+        correlation = correlation.drop(corr_to, axis=1)
+
+        correlations.append(correlation.loc[corr_to])
+        correlations_index.append(concept.name)
+
+    return pd.DataFrame(correlations,
+                        index=correlations_index, columns=correlation.columns)
+
+
+def exp_weighted_mean_corr_across_concepts(concepts,
+                                           context,
+                                           corr_method,
+                                           corr_to,
+                                           ground_truths=None,
+                                           typicality_metrics={
+                                               typicality_avg: [smc, jaccard, rosch]},
+                                           ):
+
+    typicalities = [exp_concept_typicality(
+        concept, context, gt, typicality_metrics) for concept, gt in zip(concepts, ground_truths)]
+
+    correlations = []
+
+    for _, typicality in zip(concepts, typicalities):
+        correlation = typicality.corr(method=corr_method)[
+            corr_to].drop([corr_to])
+        sample_size = typicality.shape[0]
+
+        correlations.append(list(correlation.values) + [sample_size])
+
+    df = pd.DataFrame(correlations, columns=list(
+        correlation.index) + ['Sample Size'])
+
+    # calculate weighted mean
+    for column in df.columns[:-1]:
+        df[column] = df[column] * df['Sample Size']
+
+    avg = df.sum()
+    for column in avg.index[:-1]:
+        avg[column] = avg[column] / avg['Sample Size']
+
+    return avg.drop('Sample Size')
+
+
+def exp_mean_corr_across_concepts(concepts,
+                                  context,
+                                  corr_method,
+                                  corr_to,
+                                  ground_truths=None,
+                                  typicality_metrics={
+                                      typicality_avg: [smc, jaccard, rosch]},
+                                  ):
+
+    typicalities = [exp_concept_typicality(
+        concept, context, gt, typicality_metrics) for concept, gt in zip(concepts, ground_truths)]
+
+    correlations = []
+
+    for _, typicality in zip(concepts, typicalities):
+        correlation = typicality.corr(method=corr_method)[
+            corr_to].drop([corr_to])
+
+        correlations.append(correlation.values)
+
+    df = pd.DataFrame(correlations, columns=correlation.index)
+
+    return df.mean()
+
+
+def plot_typicality(df, title, decimals=3, width=None, output_dir=None):
     final_table = pd.DataFrame()
 
     for column in df.columns:
@@ -89,7 +161,7 @@ def plot_calculate_typicality(df, title, decimals=3, width=None, output_dir=None
     fig.layout.width = width
 
     if output_dir:
-        output_filename = f"{plot_calculate_typicality.__name__}_{text_to_filename(title)}"
+        output_filename = f"{plot_typicality.__name__}_{text_to_filename(title)}"
 
         fig_to_file(fig, output_dir, output_filename)
 
@@ -98,7 +170,7 @@ def plot_calculate_typicality(df, title, decimals=3, width=None, output_dir=None
 
 def plot_typicality_correlation(df, title, index_title="", decimals=3, width=None, output_dir=None):
     if width is None:
-        width = len(df.columns) * 150
+        width = len(df.columns) * 200
 
     df = df.round(decimals=decimals)
 
