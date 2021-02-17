@@ -14,7 +14,7 @@ with open('README.md') as readme_file:
 
 # Requirements for end-user
 requirements = [
-    'fcapy']
+    'fcapy', 'plotly', 'pandas']
 
 
 setup(
@@ -32,7 +32,7 @@ setup(
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
     ],
-    description="Package of experiment for fcapy library.",
+    description="Package of experiments for fcapy library.",
     install_requires=requirements,
     license=__license__,
     long_description=readme,
