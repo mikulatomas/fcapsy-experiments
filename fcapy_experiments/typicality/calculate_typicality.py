@@ -1,5 +1,7 @@
 import os
 
+import numpy as np
+
 from fcapy import Context, Concept
 from fcapy.psychology.typicality import typicality_avg
 from fcapy.similarity.objects import smc, jaccard, rosch
@@ -7,6 +9,7 @@ import pandas as pd
 import plotly.figure_factory as ff
 import plotly.express as px
 from fcapy_experiments.utils import text_to_filename, fig_to_file
+from fcapy_experiments.general_plots import plot_table
 
 
 def exp_concept_typicality(concept,
@@ -172,28 +175,15 @@ def plot_typicality_correlation(df, title, index_title="", decimals=3, width=Non
     if width is None:
         width = len(df.columns) * 200
 
-    df = df.round(decimals=decimals)
-
-    fig = ff.create_table(df, index=True, index_title=index_title)
-    fig.layout.width = width
-    fig.update_layout(
-        title={
-            'text': title,
-            'x': 0.01,
-            'xanchor': 'left'},
-        margin={'t': 70})
-
-    fig.layout.width = width
-
     if output_dir:
         output_filename = f"{plot_typicality_correlation.__name__}_{text_to_filename(title)}"
 
         if index_title != "":
             output_filename = f"{output_filename}_{index_title}"
+    else:
+        output_filename = None
 
-        fig_to_file(fig, output_dir, output_filename)
-
-    return fig
+    return plot_table(df, title, index_title=index_title, decimals=decimals, width=width, output_dir=output_dir, output_filename=output_filename)
 
 
 def plot_boxplot_typicality(df, title, output_dir=None):
