@@ -11,6 +11,8 @@ import plotly.express as px
 from fcapy_experiments.utils import text_to_filename, fig_to_file
 from fcapy_experiments.general_plots import plot_table
 
+from fcapy.algorithms.lindig import upper_neighbors, lower_neighbors
+
 
 def exp_concept_typicality(concept,
                            context,
@@ -49,6 +51,47 @@ def exp_concept_typicality(concept,
             df = df.rename(columns={human_rating_column: name})
 
     return df
+
+
+def exp_mean_typicality_across_concepts(concepts,
+                                        context,
+                                        typicality_metrics={
+                                            typicality_avg: [smc, jaccard, rosch]},
+                                        ):
+    rows = []
+    for concept in concepts:
+        typicalities = exp_concept_typicality(concept, context)
+        mean = typicalities.mean()
+
+        rows.append(mean)
+
+    df = pd.DataFrame(rows, columns=typicalities.columns)
+
+    return df.mean()
+
+
+def exp_mean_typicality_neighbor_concepts(concept,
+                                          context,
+                                          typicality_metrics={
+                                              typicality_avg: [smc, jaccard, rosch]}):
+
+    typicalities = exp_concept_typicality(concept, context)
+
+    mean_typ = typicalities.mean()
+
+    upper_neighbor = upper_neighbors(context, concept)
+    lower_neighbor = lower_neighbors(context, concept)
+
+    mean_upper_typ = exp_mean_typicality_across_concepts(
+        upper_neighbor, context, typicality_metrics=typicality_metrics)
+
+    mean_lower_typ = exp_mean_typicality_across_concepts(
+        lower_neighbor, context, typicality_metrics=typicality_metrics)
+
+    index = [f'{concept.name} upper', concept.name, f'{concept.name} lower']
+    rows = [mean_upper_typ, mean_typ, mean_lower_typ]
+
+    return pd.DataFrame(rows, index=index, columns=typicalities.columns)
 
 
 def exp_corr_across_concepts(concepts,
@@ -169,6 +212,21 @@ def plot_typicality(df, title, decimals=3, width=None, output_dir=None):
         fig_to_file(fig, output_dir, output_filename)
 
     return fig
+
+
+def plot_mean_typicality_neighbor_concepts(df, title, index_title="", decimals=3, width=None, output_dir=None):
+    if width is None:
+        width = len(df.columns) * 200
+
+    if output_dir:
+        output_filename = f"{plot_mean_typicality_neighbor_concepts.__name__}_{text_to_filename(title)}"
+
+        if index_title != "":
+            output_filename = f"{output_filename}_{index_title}"
+    else:
+        output_filename = None
+
+    return plot_table(df, title, index_title=index_title, decimals=decimals, width=width, output_dir=output_dir, output_filename=output_filename)
 
 
 def plot_typicality_correlation(df, title, index_title="", decimals=3, width=None, output_dir=None):
