@@ -3,7 +3,7 @@ import pandas as pd
 from fcapy import Context, Concept
 from fcapy.psychology.basic_level import basic_level_avg
 from fcapy.psychology.cohesion import cohesion_avg
-from fcapy.similarity.objects import smc, jaccard
+from fcapy.similarity import smc, jaccard
 from fcapy.algorithms.lindig import upper_neighbors, lower_neighbors
 
 from fcapy_experiments.utils import text_to_filename, fig_to_file

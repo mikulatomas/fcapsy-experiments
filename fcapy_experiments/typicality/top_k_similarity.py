@@ -3,7 +3,7 @@ import os
 
 from fcapy import Context, Concept
 from fcapy.psychology.typicality import typicality_avg
-from fcapy.similarity.objects import smc, jaccard, rosch
+from fcapy.similarity import smc, jaccard, rosch
 from fcapy.utils import iterator_mean
 import pandas as pd
 import plotly.express as px

@@ -4,7 +4,7 @@ import numpy as np
 
 from fcapy import Context, Concept
 from fcapy.psychology.typicality import typicality_avg
-from fcapy.similarity.objects import smc, jaccard, rosch
+from fcapy.similarity import smc, jaccard, rosch
 import pandas as pd
 import plotly.figure_factory as ff
 import plotly.express as px
@@ -17,6 +17,7 @@ from fcapy.algorithms.lindig import upper_neighbors, lower_neighbors
 def exp_concept_typicality(concept,
                            context,
                            ground_truths=None,
+                           axis=0,
                            typicality_metrics={
                                typicality_avg: [smc, jaccard, rosch]}):
     columns = []
@@ -25,19 +26,24 @@ def exp_concept_typicality(concept,
         columns.extend([
             f"{typicality.short_name}({similarity_function.short_name})" for similarity_function in similarity_functions])
 
+    item_set = concept.extent
+
+    if axis == 1:
+        item_set = concept.intent
+
     df = pd.DataFrame(
         columns=columns,
-        index=concept.extent.members(),
+        index=item_set.members(),
         dtype=float)
 
-    for obj in concept.extent:
+    for item in item_set:
         row = []
 
         for typicality, similarity_functions in typicality_metrics.items():
-            row.extend([typicality(obj, concept, context, similarity_function)
+            row.extend([typicality(item, concept, context, similarity_function, axis=axis)
                         for similarity_function in similarity_functions])
 
-        df.loc[obj] = row
+        df.loc[item] = row
 
     if ground_truths is not None:
         for name, values in ground_truths.items():
@@ -180,7 +186,7 @@ def exp_mean_corr_across_concepts(concepts,
     return df.mean()
 
 
-def plot_typicality(df, title, decimals=3, width=None, output_dir=None):
+def create_typicality_table(df, decimals=3):
     final_table = pd.DataFrame()
 
     for column in df.columns:
@@ -191,6 +197,12 @@ def plot_typicality(df, title, decimals=3, width=None, output_dir=None):
         final_table[column] = round_and_sort.reset_index()[column]
 
     final_table = final_table.reset_index().drop('index', axis=1)
+
+    return final_table
+
+
+def plot_typicality(df, title, decimals=3, width=None, output_dir=None):
+    final_table = create_typicality_table(df, decimals=decimals)
 
     if width is None:
         width = len(df.columns) * 230
