@@ -1,6 +1,6 @@
 # fcapsy-experiments
 
-📦 Package of experiments for fcapsy [fcapsy](https://github.com/mikulatomas/fcapsy) library.
+📦 Package of experiments for [fcapsy](https://github.com/mikulatomas/fcapsy) library.
 
 Work in progress.
 
