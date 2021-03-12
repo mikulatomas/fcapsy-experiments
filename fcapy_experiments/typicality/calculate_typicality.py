@@ -2,16 +2,16 @@ import os
 
 import numpy as np
 
-from fcapy import Context, Concept
-from fcapy.psychology.typicality import typicality_avg
-from fcapy.similarity import smc, jaccard, rosch
+from fcapsy import Context, Concept
+from fcapsy.psychology.typicality import typicality_avg
+from fcapsy.similarity import smc, jaccard, rosch
 import pandas as pd
 import plotly.figure_factory as ff
 import plotly.express as px
-from fcapy_experiments.utils import text_to_filename, fig_to_file
-from fcapy_experiments.general_plots import plot_table
+from fcapsy_experiments.utils import text_to_filename, fig_to_file
+from fcapsy_experiments.general_plots import plot_table
 
-from fcapy.algorithms.lindig import upper_neighbors, lower_neighbors
+from fcapsy.algorithms.lindig import upper_neighbors, lower_neighbors
 
 
 def exp_concept_typicality(concept,

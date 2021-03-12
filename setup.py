@@ -14,7 +14,7 @@ with open('README.md') as readme_file:
 
 # Requirements for end-user
 requirements = [
-    'fcapy', 'plotly', 'pandas']
+    'fcapsy', 'plotly', 'pandas']
 
 
 setup(
@@ -32,17 +32,17 @@ setup(
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
     ],
-    description="Package of experiments for fcapy library.",
+    description="Package of experiments for fcapsy library.",
     install_requires=requirements,
     license=__license__,
     long_description=readme,
     long_description_content_type='text/markdown',
     include_package_data=True,
     keywords='fca formal concept analysis experiments',
-    name='fcapy_experiments',
+    name='fcapsy_experiments',
     packages=find_packages(
-        include=['fcapy_experiments', 'fcapy_experiments.*']),
-    url='https://github.com/mikulatomas/fcapy_experiments',
+        include=['fcapsy_experiments', 'fcapsy_experiments.*']),
+    url='https://github.com/mikulatomas/fcapsy_experiments',
     version=__version__,
     zip_safe=False,
 )

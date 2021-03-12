@@ -1,14 +1,14 @@
 from itertools import combinations
 import os
 
-from fcapy import Context, Concept
-from fcapy.psychology.typicality import typicality_avg
-from fcapy.similarity import smc, jaccard, rosch
-from fcapy.utils import iterator_mean
+from fcapsy import Context, Concept
+from fcapsy.psychology.typicality import typicality_avg
+from fcapsy.similarity import smc, jaccard, rosch
+from fcapsy.utils import iterator_mean
 import pandas as pd
 import plotly.express as px
 
-from fcapy_experiments.utils import text_to_filename, fig_to_file
+from fcapsy_experiments.utils import text_to_filename, fig_to_file
 
 
 def k_values_or_until_differs(iterator, k):

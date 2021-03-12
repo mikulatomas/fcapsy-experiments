@@ -1,11 +1,11 @@
-# fcapy-experiments
+# fcapsy-experiments
 
-📦 Package of experiments for fcapy [fcapy](https://github.com/mikulatomas/fcapy) library.
+📦 Package of experiments for fcapsy [fcapsy](https://github.com/mikulatomas/fcapsy) library.
 
 Work in progress.
 
 ## Dependencies
 
 * Python (>= 3.6)
-* fcapy
+* fcapsy
 * plotly

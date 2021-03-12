@@ -1,4 +1,4 @@
-from fcapy_experiments.typicality.top_k_similarity import k_values_or_until_differs
+from fcapsy_experiments.typicality.top_k_similarity import k_values_or_until_differs
 
 
 def test_k_values_or_until_differs1():

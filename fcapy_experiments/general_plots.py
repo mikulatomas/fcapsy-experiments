@@ -1,5 +1,5 @@
 import plotly.figure_factory as ff
-from fcapy_experiments.utils import fig_to_file, text_to_filename
+from fcapsy_experiments.utils import fig_to_file, text_to_filename
 
 
 def plot_table(df, title, index_title="", decimals=3, width=None, output_dir=None, output_filename=None):

@@ -1,13 +1,13 @@
 import pandas as pd
 
-from fcapy import Context, Concept
-from fcapy.psychology.basic_level import basic_level_avg
-from fcapy.psychology.cohesion import cohesion_avg
-from fcapy.similarity import smc, jaccard
-from fcapy.algorithms.lindig import upper_neighbors, lower_neighbors
+from fcapsy import Context, Concept
+from fcapsy.psychology.basic_level import basic_level_avg
+from fcapsy.psychology.cohesion import cohesion_avg
+from fcapsy.similarity import smc, jaccard
+from fcapsy.algorithms.lindig import upper_neighbors, lower_neighbors
 
-from fcapy_experiments.utils import text_to_filename, fig_to_file
-from fcapy_experiments.general_plots import plot_table
+from fcapsy_experiments.utils import text_to_filename, fig_to_file
+from fcapsy_experiments.general_plots import plot_table
 
 
 def exp_concept_basic_level(concepts,
