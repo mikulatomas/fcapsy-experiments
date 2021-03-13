@@ -4,6 +4,8 @@
 
 Work in progress.
 
+![logo](logo.png)
+
 ## Dependencies
 
 * Python (>= 3.6)
