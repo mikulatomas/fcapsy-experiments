@@ -4,7 +4,7 @@
 
 Work in progress.
 
-![logo](logo.png)
+![logo](logo.jpg)
 
 ## Dependencies
 
