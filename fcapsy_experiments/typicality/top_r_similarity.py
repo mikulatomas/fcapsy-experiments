@@ -7,11 +7,16 @@ from fcapsy.similarity import jaccard
 
 
 class TopRSimilarity:
-    def __init__(self, source, context, similarity=jaccard) -> None:
+    def __init__(
+        self, source, context, similarity=jaccard, ignore_columns=None
+    ) -> None:
+        if ignore_columns is None:
+            ignore_columns = []
+
         self._similarity = similarity
         self._source = source
         self._context = context
-        self.df = self._init(self)
+        self.df = self._init(self, ignore_columns)
 
     @staticmethod
     def _k_values_or_until_differs(iterator, r):
@@ -60,12 +65,16 @@ class TopRSimilarity:
         return min(i1, i2)
 
     @staticmethod
-    def _init(inst):
+    def _init(inst, ignore_columns):
         r_range = range(1, len(inst._source.index))
 
         results = []
 
-        for column1, column2 in combinations(inst._source.columns, 2):
+        filtered_columns = filter(
+            lambda c: c not in ignore_columns, inst._source.columns
+        )
+
+        for column1, column2 in combinations(filtered_columns, 2):
             column1_order = list(
                 inst._source.sort_values(column1, ascending=False).index
             )
@@ -93,7 +102,7 @@ class TopRSimilarity:
             y="top_k_similarity",
             color="label",
             labels={"label": "Legend"},
-            line_dash="label"
+            line_dash="label",
         )
 
         fig.update_layout(
@@ -108,7 +117,8 @@ class TopRSimilarity:
                 showline=True,
                 linecolor="black",
                 linewidth=1,
-                tickfont=dict(family="IBM Plex Sans", size=11, color="black")
+                tickangle=-90,
+                tickfont=dict(family="IBM Plex Sans", size=11, color="black"),
             ),
             yaxis=dict(
                 title="S",
@@ -117,11 +127,13 @@ class TopRSimilarity:
                 showline=True,
                 linecolor="black",
                 linewidth=1,
-                tickfont=dict(family="IBM Plex Sans", size=11, color="black")
+                tickfont=dict(family="IBM Plex Sans", size=11, color="black"),
             ),
             paper_bgcolor="rgba(255,255,255,1)",
             plot_bgcolor="rgba(255,255,255,1)",
-            legend=dict(yanchor="bottom", y=0.05, xanchor="right", x=0.97, font=dict(family="IBM Plex Sans", size=11),),
+            legend=dict(
+                font=dict(family="IBM Plex Sans", size=10),
+            ),
         )
 
         return fig
@@ -131,5 +143,6 @@ class TopRSimilarity:
             full_html=False,
             include_plotlyjs="cdn",
             include_mathjax="cdn",
-            default_width="700px",
+            default_width=700,
+            default_height=390
         )
