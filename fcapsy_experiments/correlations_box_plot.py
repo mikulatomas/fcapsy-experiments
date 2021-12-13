@@ -1,18 +1,24 @@
 import pandas as pd
+import numpy as np
 import plotly.graph_objects as go
 
 
 def correlations_boxplots(correlations, to):
+    ## TODO prasarna
     rows = []
 
     for correlation in correlations:
         dataset = correlation.dataset
         local_df = correlation.kendall.corr
         local_df_p_values = correlation.kendall.p_values
+        
+        local_row = local_df.drop(to, axis=1)
+        local_row.loc[to][local_df_p_values.drop(to, axis=1).loc[to] > 0.04] = np.NaN
+        # print(local_row.loc[to])
 
-        rows.append([dataset] + list(local_df.drop(to, axis=1).loc[to]))
+        rows.append([dataset] + list(local_row.loc[to]))
 
-    type = correlations[0].type.title()
+    # type = correlations[0].type.title()
 
     df = pd.DataFrame(
         rows,
@@ -32,7 +38,7 @@ def correlations_boxplots(correlations, to):
         margin=dict(l=15, r=15, t=15, b=15),
         legend_traceorder="reversed",
         xaxis=dict(
-            title=f"{type} correlation to {to}",
+            title=f"kendall correlation to {to}",
             zeroline=False,
             ticks="inside",
             showline=True,
