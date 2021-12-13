@@ -8,7 +8,8 @@ css = [
             ("text-align", "right"),
         ],
     },
-    {"selector": "td", "props": [("padding", "4px")]},
+    {"selector": "td", "props": [("padding", "3px")]},
+    {"selector": ".row_heading", "props": [("padding-right", "3px")]}
 ]
 
 css_typ = [
