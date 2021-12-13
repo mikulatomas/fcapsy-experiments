@@ -39,8 +39,11 @@ class ConceptTypicality:
         columns = []
 
         for name, typicality in typicality_functions.items():
-            for arg in typicality["args"].keys():
-                columns.append(f"{name}({arg})")
+            if typicality["args"]:
+                for arg in typicality["args"].keys():
+                    columns.append(f"{name}({arg})")
+            else:
+                columns.append(f"{name}")
 
         df = pd.DataFrame(index=items, columns=columns, dtype=float)
 
@@ -50,7 +53,10 @@ class ConceptTypicality:
             for typicality in typicality_functions.values():
                 function = typicality["func"]
                 args = typicality["args"].values()
-                row.extend([function(item, concept, *arg) for arg in args])
+                if args:
+                    row.extend([function(item, concept, *arg) for arg in args])
+                else:
+                    row.append(function(item, concept))
 
             df.loc[item] = row
 
