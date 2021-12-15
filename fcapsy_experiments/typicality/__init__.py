@@ -1,2 +1,2 @@
-from .calculate_typicality import *
-from .top_k_similarity import *
+from .concept_typicality import ConceptTypicality
+from .top_r_similarity import TopRSimilarity
