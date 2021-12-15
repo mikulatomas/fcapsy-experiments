@@ -14,11 +14,8 @@ def correlations_boxplots(correlations, to):
         
         local_row = local_df.drop(to, axis=1)
         local_row.loc[to][local_df_p_values.drop(to, axis=1).loc[to] > 0.04] = np.NaN
-        # print(local_row.loc[to])
 
         rows.append([dataset] + list(local_row.loc[to]))
-
-    # type = correlations[0].type.title()
 
     df = pd.DataFrame(
         rows,

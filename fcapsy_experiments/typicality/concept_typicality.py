@@ -4,7 +4,7 @@ import pandas as pd
 import plotly.graph_objects as go
 from sklearn.preprocessing import MinMaxScaler
 
-from fcapsy.typicality import typicality_avg, _get_vectors
+from fcapsy.typicality import typicality_avg
 from fcapsy.similarity import jaccard, smc, rosch
 
 from fcapsy_experiments._styles import css, css_typ
