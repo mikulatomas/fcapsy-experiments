@@ -85,7 +85,7 @@ class ConceptTypicality:
         final_table = pd.DataFrame()
 
         for column in self.df.columns:
-            round_and_sort = self.df.sort_values(column, ascending=False)
+            round_and_sort = self.df.sort_values(column, ascending=False, kind="mergesort")
 
             final_table[f"{column} order"] = round_and_sort.index
             final_table[column] = round_and_sort.reset_index()[column]
@@ -104,7 +104,7 @@ class ConceptTypicality:
 
         scatters = []
 
-        df = self.df.sort_values(self.df.columns[0], ascending=False)
+        df = self.df.sort_values(self.df.columns[0], ascending=False, kind="mergesort")
 
         if "Count" in df.columns:
             # scaling Count column 

@@ -76,10 +76,10 @@ class TopRSimilarity:
 
         for column1, column2 in combinations(filtered_columns, 2):
             column1_order = list(
-                inst._source.sort_values(column1, ascending=False).index
+                inst._source.sort_values(column1, ascending=False, kind="mergesort").index
             )
             column2_order = list(
-                inst._source.sort_values(column2, ascending=False).index
+                inst._source.sort_values(column2, ascending=False, kind="mergesort").index
             )
 
             label = f"{column1}-{column2}"
