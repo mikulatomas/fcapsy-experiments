@@ -11,3 +11,7 @@ Work in progress.
 * Python (>= 3.6)
 * fcapsy
 * plotly
+* pandas
+* numpy
+* sklearn
+* fuzzycorr
