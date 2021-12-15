@@ -17,6 +17,7 @@ $ pip install fcapsy-experiments
 ## Used in papers
 > Belohlavek, R., & Mikula, T. (2020). Typicality in Conceptual Structures Within the Framework of Formal Concept Analysis. Proceedings of CLA 2020, 33-45.
 http://ceur-ws.org/Vol-2668/paper2.pdf
+
 > Belohlavek, R., & Mikula, T. (2021). Typicality: A formal concept analysis account. International Journal of Approximate Reasoning.
 https://doi.org/10.1016/j.ijar.2021.12.001
 
