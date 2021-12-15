@@ -1,1 +1,1 @@
-from .attributes_centrality import AttributesCentrality
+from .centrality import Centrality
