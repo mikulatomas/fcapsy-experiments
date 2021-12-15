@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 from fcapsy_experiments import __version__, __author__, __email__, __license__
 
 setup(
-    name="fcapsy_experiments",
+    name="fcapsy-experiments",
     version=__version__,
     author=__author__,
     author_email=__email__,
