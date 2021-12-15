@@ -1,3 +1,4 @@
+[![PyPI version](https://badge.fury.io/py/fcapsy-experiments.svg)](https://badge.fury.io/py/fcapsy-experiments)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 # fcapsy-experiments
