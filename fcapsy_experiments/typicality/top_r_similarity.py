@@ -1,3 +1,5 @@
+import typing
+
 import pandas as pd
 import plotly.express as px
 
@@ -8,8 +10,20 @@ from fcapsy.similarity import jaccard
 
 class TopRSimilarity:
     def __init__(
-        self, source, context, similarity=jaccard, ignore_columns=None
+        self,
+        source: "pd.DataFrame",
+        context: "concepts.Context",
+        similarity: typing.Callable = jaccard,
+        ignore_columns: typing.List[str] = None,
     ) -> None:
+        """Calculates TopR similarities for given dataframe.
+
+        Args:
+            source (pd.DataFrame): source data (usually objects ordered by multiple metrics)
+            context (concepts.Context): source formal context
+            similarity (typing.Callable, optional): similarity which should be used. Defaults to jaccard.
+            ignore_columns (typing.List[str], optional): which columns to ignore from source dataframe. Defaults to None.
+        """
         if ignore_columns is None:
             ignore_columns = []
 
@@ -76,10 +90,14 @@ class TopRSimilarity:
 
         for column1, column2 in combinations(filtered_columns, 2):
             column1_order = list(
-                inst._source.sort_values(column1, ascending=False, kind="mergesort").index
+                inst._source.sort_values(
+                    column1, ascending=False, kind="mergesort"
+                ).index
             )
             column2_order = list(
-                inst._source.sort_values(column2, ascending=False, kind="mergesort").index
+                inst._source.sort_values(
+                    column2, ascending=False, kind="mergesort"
+                ).index
             )
 
             label = f"{column1}-{column2}"
@@ -95,7 +113,12 @@ class TopRSimilarity:
 
         return pd.DataFrame(results, columns=["r", "top_k_similarity", "label"])
 
-    def to_plotly(self):
+    def to_plotly(self) -> "go.Figure":
+        """Generates plotly figure.
+
+        Returns:
+            go.Figure: figure
+        """
         fig = px.line(
             self.df,
             x="r",
@@ -105,6 +128,7 @@ class TopRSimilarity:
             line_dash="label",
         )
 
+        # layout needs some cleaning
         fig.update_layout(
             title=dict(
                 font=dict(family="IBM Plex Sans", size=14, color="black"),
@@ -138,11 +162,22 @@ class TopRSimilarity:
 
         return fig
 
-    def to_plotly_html(self):
+    def to_plotly_html(
+        self, default_width: int = 700, default_height: int = 390
+    ) -> str:
+        """Generates html version of plotly graph
+
+        Args:
+            default_width (int, optional): default graph width. Defaults to 700.
+            default_height (int, optional): default graph height. Defaults to 390.
+
+        Returns:
+            str: graph html
+        """
         return self.to_plotly().to_html(
             full_html=False,
             include_plotlyjs="cdn",
             include_mathjax="cdn",
-            default_width=700,
-            default_height=390
+            default_width=default_width,
+            default_height=default_height,
         )
