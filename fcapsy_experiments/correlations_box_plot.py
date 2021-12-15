@@ -4,7 +4,6 @@ import plotly.graph_objects as go
 
 
 def correlations_boxplots(correlations, to):
-    ## TODO prasarna
     rows = []
 
     for correlation in correlations:
