@@ -84,9 +84,14 @@ class ConceptTypicality:
                 function = typicality["func"]
                 args = typicality["args"].values()
                 if args:
-                    row.extend([function(item, concept, *arg) for arg in args])
+                    row = []
+                    for name, arg in typicality["args"].items():
+                        print(name)
+                        row.append(function(item, concept, *arg))
                 else:
                     row.append(function(item, concept))
+                
+                
 
             df.loc[item] = row
 
