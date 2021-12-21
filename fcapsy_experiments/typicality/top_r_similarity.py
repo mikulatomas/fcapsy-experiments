@@ -5,7 +5,7 @@ import plotly.express as px
 
 from statistics import mean
 from itertools import combinations
-from fcapsy.similarity import jaccard
+from binsdpy.similarity import jaccard
 
 
 class TopRSimilarity:

@@ -13,7 +13,16 @@ setup(
     url="https://github.com/mikulatomas/fcapsy_experiments",
     packages=find_packages(),
     python_requires=">=3.6",
-    install_requires=["fcapsy", "plotly", "pandas"],
+    install_requires=[
+        "fcapsy",
+        "plotly",
+        "pandas",
+        "binsdpy",
+        "sklearn",
+        "fuzzycorr",
+        "scipy",
+        "numpy",
+    ],
     long_description=pathlib.Path("README.md").read_text(encoding="utf-8"),
     long_description_content_type="text/markdown",
     classifiers=[

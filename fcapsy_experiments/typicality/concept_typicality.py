@@ -6,7 +6,7 @@ import plotly.graph_objects as go
 
 from sklearn.preprocessing import MinMaxScaler
 from fcapsy.typicality import typicality_avg
-from fcapsy.similarity import jaccard, smc, rosch
+from binsdpy.similarity import jaccard, smc, russell_rao
 
 from fcapsy_experiments._styles import css, css_typ
 
@@ -38,7 +38,7 @@ class ConceptTypicality:
                 "typ_avg": {
                     # must be callable
                     "func": typicality_avg,
-                    "args": {"J": [jaccard], "SMC": [smc], "R": [rosch]},
+                    "args": {"J": [jaccard], "SMC": [smc], "R": [russell_rao]},
                 }
             }
 
