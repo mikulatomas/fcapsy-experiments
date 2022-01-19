@@ -4,7 +4,7 @@ from fcapsy_experiments import __version__, __author__, __email__, __license__
 
 setup(
     name="fcapsy-experiments",
-    version="0.2.1",
+    version="0.2.2",
     author="Tomáš Mikula",
     author_email="mail@tomasmikula.cz",
     description="Package of experiments for fcapsy library.",
