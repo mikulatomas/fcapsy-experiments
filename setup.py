@@ -11,7 +11,7 @@ setup(
     license="MIT license",
     url="https://github.com/mikulatomas/fcapsy_experiments",
     packages=find_packages(),
-    python_requires=">=3.6",
+    python_requires=">=3.7",
     install_requires=[
         "fcapsy",
         "plotly",
