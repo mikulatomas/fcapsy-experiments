@@ -9,7 +9,7 @@ css = [
         ],
     },
     {"selector": "td", "props": [("padding", "3px")]},
-    {"selector": ".row_heading", "props": [("padding-right", "3px")]}
+    {"selector": ".row_heading", "props": [("padding-right", "3px")]},
 ]
 
 css_typ = [
@@ -24,6 +24,10 @@ css_typ = [
 
 css_corr = [
     {"selector": "td, th", "props": [("text-align", "center")]},
-    {"selector": "thead th", "props": [("text-align", "center !important")]},
+    # {"selector": "thead th", "props": [("text-align", "center !important")]},
     {"selector": "tbody th", "props": [("text-align", "right")]},
+    {
+        "selector": "th.col_heading",
+        "props": [("writing-mode", "vertical-rl"), ("transform", "rotateZ(-90deg)")],
+    },
 ]

@@ -1,6 +1,8 @@
 import typing
 import pandas as pd
 import numpy as np
+import plotly.express as px
+import plotly.graph_objects as go
 
 from fuzzycorr import fuzzy_correlation_factory
 from fuzzycorr.strict_orderings import lukasiewicz_strict_ordering_factory
@@ -41,7 +43,7 @@ class Correlation:
         df = df.where(np.triu(np.ones(df.shape)).astype(bool))
         return df.fillna("")
 
-    def to_html(self) -> str:
+    def to_html(self, triangle=True) -> str:
         """Generates html which represents the correlation table.
 
         Returns:
@@ -53,7 +55,10 @@ class Correlation:
                 return None
             return f"font-weight: bold;" if abs(x) < 0.2 else None
 
-        df = self._make_triangle(self.corr)
+        if triangle:
+            df = self._make_triangle(self.corr)
+        else:
+            df = self.corr
 
         df = df.style.format(precision=2)
         df.set_table_styles(css + css_corr)
@@ -61,7 +66,7 @@ class Correlation:
 
         return df.to_html()
 
-    def p_values_to_html(self) -> typing.Optional[str]:
+    def p_values_to_html(self, triangle=True) -> typing.Optional[str]:
         """Generates html of pvalues table.
 
         Returns:
@@ -76,13 +81,27 @@ class Correlation:
         if self.p_values is None:
             return None
 
-        df = self._make_triangle(self.p_values)
+        if triangle:
+            df = self._make_triangle(self.p_values)
+        else:
+            df = self.p_values
 
         df = df.style.format(precision=2)
         df.set_table_styles(css + css_corr)
         df.applymap(highlight_high_p_value)
 
         return df.to_html()
+
+    def to_plotly(self) -> "go.Figure":
+        fig = px.imshow(self.corr)
+        return fig
+
+    def to_plotly_html(self) -> str:
+        return self.to_plotly().to_html(
+            full_html=False,
+            include_plotlyjs="cdn",
+            include_mathjax="cdn",
+        )
 
 
 class CorrelationTable:
