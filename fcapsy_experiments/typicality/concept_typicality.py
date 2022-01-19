@@ -1,5 +1,4 @@
 import itertools
-import typing
 
 import pandas as pd
 import plotly.graph_objects as go
@@ -89,8 +88,6 @@ class ConceptTypicality:
                         row.append(function(item, concept, *arg))
                 else:
                     row.append(function(item, concept))
-                
-                
 
             df.loc[item] = row
 
@@ -98,7 +95,11 @@ class ConceptTypicality:
             counts = (extent.bits().count("1") for extent in self._items_sets)
 
             df[self.count_label] = [
-                row[1] for row in filter(lambda x: x[0] in self._concept_core, zip(self._items_domain, counts))
+                row[1]
+                for row in filter(
+                    lambda x: x[0] in self._concept_core,
+                    zip(self._items_domain, counts),
+                )
             ]
 
         if extra_columns:
@@ -206,7 +207,9 @@ class ConceptTypicality:
 
         return fig
 
-    def to_plotly_html(self, default_width: int=700, default_height: int=390) -> str:
+    def to_plotly_html(
+        self, default_width: int = 700, default_height: int = 390
+    ) -> str:
         """Generates html version of plotly graph
 
         Args:

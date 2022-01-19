@@ -11,7 +11,7 @@ def correlations_boxplots(correlations, to):
         dataset = correlation.dataset
         local_df = correlation.kendall.corr
         local_df_p_values = correlation.kendall.p_values
-        
+
         local_row = local_df.drop(to, axis=1)
         local_row.loc[to][local_df_p_values.drop(to, axis=1).loc[to] > 0.04] = np.NaN
 
@@ -66,8 +66,8 @@ def correlations_boxplots(correlations, to):
     fig.update_traces(orientation="h")
 
     return fig.to_html(
-            full_html=False,
-            include_plotlyjs="cdn",
-            include_mathjax="cdn",
-            default_width=739 // 2,
-        )
+        full_html=False,
+        include_plotlyjs="cdn",
+        include_mathjax="cdn",
+        default_width=739 // 2,
+    )
