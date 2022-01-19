@@ -4,12 +4,12 @@ from fcapsy_experiments import __version__, __author__, __email__, __license__
 
 setup(
     name="fcapsy-experiments",
-    version=__version__,
-    author=__author__,
-    author_email=__email__,
+    version="0.2.1",
+    author="Tomáš Mikula",
+    author_email="mail@tomasmikula.cz",
     description="Package of experiments for fcapsy library.",
     keywords="fca formal concept analysis experiments",
-    license=__license__,
+    license="MIT license",
     url="https://github.com/mikulatomas/fcapsy_experiments",
     packages=find_packages(),
     python_requires=">=3.6",
