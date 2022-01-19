@@ -86,7 +86,6 @@ class ConceptTypicality:
                 if args:
                     row = []
                     for name, arg in typicality["args"].items():
-                        print(name)
                         row.append(function(item, concept, *arg))
                 else:
                     row.append(function(item, concept))
