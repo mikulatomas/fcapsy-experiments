@@ -1,6 +1,5 @@
 import pathlib
 from setuptools import setup, find_packages
-from fcapsy_experiments import __version__, __author__, __email__, __license__
 
 setup(
     name="fcapsy-experiments",
