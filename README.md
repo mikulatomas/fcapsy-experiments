@@ -27,7 +27,6 @@ https://doi.org/10.1016/j.ijar.2021.12.001
 
 fcapsy-experiments requires:
 
-* Python (>= 3.6)
 * fcapsy
 * plotly
 * pandas
