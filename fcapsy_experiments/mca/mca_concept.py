@@ -93,8 +93,8 @@ class MCAConcept:
 
             fig = px.scatter(
                 data,
-                x=0,
-                y=1,
+                x="x",
+                y="y",
                 hover_name=list(
                     map(
                         lambda txt: "<br>".join(textwrap.wrap(txt, width=50)),
