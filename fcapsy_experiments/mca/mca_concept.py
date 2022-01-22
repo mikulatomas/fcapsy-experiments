@@ -80,7 +80,7 @@ class MCAConcept:
                 z="z",
                 hover_name=list(
                     map(
-                        lambda txt: "<br>".join(textwrap.wrap(txt, width=50)),
+                        lambda txt: "<br>".join(textwrap.wrap(str(txt), width=50)),
                         self.concept_df_transformed.index,
                     )
                 ),
@@ -97,7 +97,7 @@ class MCAConcept:
                 y="y",
                 hover_name=list(
                     map(
-                        lambda txt: "<br>".join(textwrap.wrap(txt, width=50)),
+                        lambda txt: "<br>".join(textwrap.wrap(str(txt), width=50)),
                         self.concept_df_transformed.index,
                     )
                 ),
