@@ -1,2 +1,3 @@
 from .concept_typicality import ConceptTypicality
 from .top_r_similarity import TopRSimilarity
+from .top_bottom_r_similarity import TopBottomRSimilarity

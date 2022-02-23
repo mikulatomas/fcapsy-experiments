@@ -24,10 +24,20 @@ css_typ = [
 
 css_corr = [
     {"selector": "td, th", "props": [("text-align", "center")]},
-    # {"selector": "thead th", "props": [("text-align", "center !important")]},
+    {"selector": "thead th", "props": [("height", "50px"), ("text-align", "left")]},
     {"selector": "tbody th", "props": [("text-align", "right")]},
     {
         "selector": "th.col_heading",
-        "props": [("writing-mode", "vertical-rl"), ("transform", "rotateZ(-90deg)")],
+        "props": [
+            ("writing-mode", "vertical-rl"),
+            ("transform", "rotateZ(-90deg)"),
+            ("text-align", "left"),
+        ],
     },
+]
+
+css_centrality = [
+    {"selector": "td, th", "props": [("text-align", "center")]},
+    {"selector": "thead th", "props": [("text-align", "center")]},
+    {"selector": "tbody th", "props": [("text-align", "right")]},
 ]

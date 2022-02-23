@@ -57,9 +57,9 @@ class MCAConcept:
         data = self.concept_df_transformed.copy()
 
         hover_data = {
-                "x": False,
-                "y": False,
-            }
+            "x": False,
+            "y": False,
+        }
 
         if self._color_by is not None:
             color_name = self._color_by[0]
@@ -67,12 +67,12 @@ class MCAConcept:
             hover_data[color_name] = ":.2f"
         else:
             color_name = None
-            
+
         if self.n_components == 3:
             data = data.rename(columns={0: "x", 1: "y", 2: "z"})
 
             hover_data["z"] = False
-            
+
             fig = px.scatter_3d(
                 data,
                 x="x",
@@ -107,3 +107,23 @@ class MCAConcept:
             )
 
         return fig
+
+    def to_plotly_html(
+        self, default_width: int = 700, default_height: int = 390
+    ) -> str:
+        """Generates html version of plotly graph
+
+        Args:
+            default_width (int, optional): default graph width. Defaults to 700.
+            default_height (int, optional): default graph height. Defaults to 390.
+
+        Returns:
+            str: graph html
+        """
+        return self.to_plotly().to_html(
+            full_html=False,
+            include_plotlyjs="cdn",
+            include_mathjax="cdn",
+            default_width=default_width,
+            default_height=default_height,
+        )

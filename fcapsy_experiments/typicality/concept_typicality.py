@@ -37,7 +37,11 @@ class ConceptTypicality:
                 "typ_avg": {
                     # must be callable
                     "func": typicality_avg,
-                    "args": {"J": [jaccard], "SMC": [smc], "R": [russell_rao]},
+                    "args": {
+                        "J": {"similarity": jaccard},
+                        "SMC": {"similarity": smc},
+                        "R": {"similarity": russell_rao},
+                    },
                 }
             }
 
@@ -82,10 +86,10 @@ class ConceptTypicality:
             for typicality in typicality_functions.values():
                 function = typicality["func"]
                 args = typicality["args"].values()
+
                 if args:
-                    row = []
-                    for name, arg in typicality["args"].items():
-                        row.append(function(item, concept, *arg))
+                    for _, arg in typicality["args"].items():
+                        row.append(function(item, concept, **arg))
                 else:
                     row.append(function(item, concept))
 

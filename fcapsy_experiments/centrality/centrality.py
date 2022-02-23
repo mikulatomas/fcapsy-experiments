@@ -1,7 +1,7 @@
 import pandas as pd
 
 from fcapsy.centrality import centrality
-from fcapsy_experiments._styles import css, css_corr
+from fcapsy_experiments._styles import css, css_centrality
 
 
 class Centrality:
@@ -95,6 +95,6 @@ class Centrality:
 
         final_table = final_table.style.format(precision=3)
         final_table.background_gradient(cmap="RdYlGn")
-        final_table.set_table_styles(css + css_corr)
+        final_table.set_table_styles(css + css_centrality)
 
         return final_table.to_html()
