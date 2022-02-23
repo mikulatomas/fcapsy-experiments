@@ -14,7 +14,7 @@ class TopRSimilarity:
         source: "pd.DataFrame",
         context: "concepts.Context",
         similarity: typing.Callable = jaccard,
-        ignore_columns: typing.List[str] = None,
+        to_columns: typing.List[str] = None,
     ) -> None:
         """Calculates TopR similarities for given dataframe.
 
@@ -22,18 +22,18 @@ class TopRSimilarity:
             source (pd.DataFrame): source data (usually objects ordered by multiple metrics)
             context (concepts.Context): source formal context
             similarity (typing.Callable, optional): similarity which should be used. Defaults to jaccard.
-            ignore_columns (typing.List[str], optional): which columns to ignore from source dataframe. Defaults to None.
+            to_columns (typing.List[str], optional): which columns to compare every other from source dataframe. Defaults to None (means all).
         """
-        if ignore_columns is None:
-            ignore_columns = []
+        if to_columns is None:
+            to_columns = source.columns
 
         self._similarity = similarity
         self._source = source
         self._context = context
-        self.df = self._init(self, ignore_columns)
+        self.df = self._init(self, to_columns)
 
     @staticmethod
-    def _k_values_or_until_differs(iterator, r):
+    def _r_values_or_until_differs(iterator, r):
         max_idx = len(iterator) - 1
 
         if r == 0:
@@ -45,9 +45,32 @@ class TopRSimilarity:
             else:
                 yield iterator[idx]
                 break
-
+    
     @staticmethod
-    def _top_r_similarity(inst, metric_1_order, metric_2_order, r):
+    def _get_column_orders(df, tuples):
+        results = []
+        labels = []
+
+        for column1, column2 in tuples:
+            column1_order = list(
+                df.sort_values(
+                    column1, ascending=False, kind="mergesort"
+                ).index
+            )
+
+            column2_order = list(
+                df.sort_values(
+                    column2, ascending=False, kind="mergesort"
+                ).index
+            )
+
+            results.append([column1_order, column2_order])
+            labels.append(f"{column1}-{column2}")
+        
+        return results, labels
+    
+    @staticmethod
+    def _top_r_similarity(context, similarity, metric_1_order, metric_2_order, r):
         def _get_vectors(context, items):
             try:
                 label_domain = context._extents
@@ -62,56 +85,45 @@ class TopRSimilarity:
             return vectors
 
         vectors_1 = _get_vectors(
-            inst._context, list(inst._k_values_or_until_differs(metric_1_order, r))
+            context, list(TopRSimilarity._r_values_or_until_differs(metric_1_order, r))
         )
         vectors_2 = _get_vectors(
-            inst._context, list(inst._k_values_or_until_differs(metric_2_order, r))
+            context, list(TopRSimilarity._r_values_or_until_differs(metric_2_order, r))
         )
 
         i1 = mean(
-            (max((inst._similarity(b1, b2) for b2 in vectors_1)) for b1 in vectors_2)
+            (max((similarity(b1, b2) for b2 in vectors_1)) for b1 in vectors_2)
         )
 
         i2 = mean(
-            (max((inst._similarity(b1, b2) for b2 in vectors_2)) for b1 in vectors_1)
+            (max((similarity(b1, b2) for b2 in vectors_2)) for b1 in vectors_1)
         )
 
         return min(i1, i2)
 
     @staticmethod
-    def _init(inst, ignore_columns):
+    def _init(inst, to_columns):
         r_range = range(1, len(inst._source.index))
 
         results = []
 
-        filtered_columns = filter(
-            lambda c: c not in ignore_columns, inst._source.columns
-        )
+        # filtered_columns = filter(
+        #     lambda c: c not in ignore_columns, inst._source.columns
+        # )
 
-        for column1, column2 in combinations(filtered_columns, 2):
-            column1_order = list(
-                inst._source.sort_values(
-                    column1, ascending=False, kind="mergesort"
-                ).index
-            )
-            column2_order = list(
-                inst._source.sort_values(
-                    column2, ascending=False, kind="mergesort"
-                ).index
-            )
+        columns_tuples, labels = inst._get_column_orders(inst._source, [(x, y) for x in inst._source.columns for y in to_columns if x != y])
 
-            label = f"{column1}-{column2}"
-
+        for (column1_order, column2_order), label in zip(columns_tuples, labels):
             for r in r_range:
                 results.append(
                     [
                         r,
-                        inst._top_r_similarity(inst, column1_order, column2_order, r),
+                        inst._top_r_similarity(inst._context, inst._similarity, column1_order, column2_order, r),
                         label,
                     ]
                 )
 
-        return pd.DataFrame(results, columns=["r", "top_k_similarity", "label"])
+        return pd.DataFrame(results, columns=["r", "top_r_similarity", "label"])
 
     def to_plotly(self) -> "go.Figure":
         """Generates plotly figure.
@@ -122,7 +134,7 @@ class TopRSimilarity:
         fig = px.line(
             self.df,
             x="r",
-            y="top_k_similarity",
+            y=self.df.columns[1],
             color="label",
             labels={"label": "Legend"},
             line_dash="label",
@@ -148,6 +160,7 @@ class TopRSimilarity:
                 title="S",
                 mirror=True,
                 ticks="inside",
+                range=[0, 1],
                 showline=True,
                 linecolor="black",
                 linewidth=1,
