@@ -107,3 +107,23 @@ class MCAConcept:
             )
 
         return fig
+    
+    def to_plotly_html(
+        self, default_width: int = 700, default_height: int = 390
+    ) -> str:
+        """Generates html version of plotly graph
+
+        Args:
+            default_width (int, optional): default graph width. Defaults to 700.
+            default_height (int, optional): default graph height. Defaults to 390.
+
+        Returns:
+            str: graph html
+        """
+        return self.to_plotly().to_html(
+            full_html=False,
+            include_plotlyjs="cdn",
+            include_mathjax="cdn",
+            default_width=default_width,
+            default_height=default_height,
+        )
