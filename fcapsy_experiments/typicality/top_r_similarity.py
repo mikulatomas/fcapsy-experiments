@@ -45,7 +45,7 @@ class TopRSimilarity:
             else:
                 yield iterator[idx]
                 break
-    
+
     @staticmethod
     def _get_column_orders(df, tuples):
         results = []
@@ -53,22 +53,18 @@ class TopRSimilarity:
 
         for column1, column2 in tuples:
             column1_order = list(
-                df.sort_values(
-                    column1, ascending=False, kind="mergesort"
-                ).index
+                df.sort_values(column1, ascending=False, kind="mergesort").index
             )
 
             column2_order = list(
-                df.sort_values(
-                    column2, ascending=False, kind="mergesort"
-                ).index
+                df.sort_values(column2, ascending=False, kind="mergesort").index
             )
 
             results.append([column1_order, column2_order])
             labels.append(f"{column1}-{column2}")
-        
+
         return results, labels
-    
+
     @staticmethod
     def _top_r_similarity(context, similarity, metric_1_order, metric_2_order, r):
         def _get_vectors(context, items):
@@ -91,13 +87,9 @@ class TopRSimilarity:
             context, list(TopRSimilarity._r_values_or_until_differs(metric_2_order, r))
         )
 
-        i1 = mean(
-            (max((similarity(b1, b2) for b2 in vectors_1)) for b1 in vectors_2)
-        )
+        i1 = mean((max((similarity(b1, b2) for b2 in vectors_1)) for b1 in vectors_2))
 
-        i2 = mean(
-            (max((similarity(b1, b2) for b2 in vectors_2)) for b1 in vectors_1)
-        )
+        i2 = mean((max((similarity(b1, b2) for b2 in vectors_2)) for b1 in vectors_1))
 
         return min(i1, i2)
 
@@ -111,14 +103,23 @@ class TopRSimilarity:
         #     lambda c: c not in ignore_columns, inst._source.columns
         # )
 
-        columns_tuples, labels = inst._get_column_orders(inst._source, [(x, y) for x in inst._source.columns for y in to_columns if x != y])
+        columns_tuples, labels = inst._get_column_orders(
+            inst._source,
+            [(x, y) for x in inst._source.columns for y in to_columns if x != y],
+        )
 
         for (column1_order, column2_order), label in zip(columns_tuples, labels):
             for r in r_range:
                 results.append(
                     [
                         r,
-                        inst._top_r_similarity(inst._context, inst._similarity, column1_order, column2_order, r),
+                        inst._top_r_similarity(
+                            inst._context,
+                            inst._similarity,
+                            column1_order,
+                            column2_order,
+                            r,
+                        ),
                         label,
                     ]
                 )

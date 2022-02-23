@@ -28,7 +28,11 @@ css_corr = [
     {"selector": "tbody th", "props": [("text-align", "right")]},
     {
         "selector": "th.col_heading",
-        "props": [("writing-mode", "vertical-rl"), ("transform", "rotateZ(-90deg)"), ("text-align", "left")],
+        "props": [
+            ("writing-mode", "vertical-rl"),
+            ("transform", "rotateZ(-90deg)"),
+            ("text-align", "left"),
+        ],
     },
 ]
 

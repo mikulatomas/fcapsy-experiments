@@ -37,7 +37,11 @@ class ConceptTypicality:
                 "typ_avg": {
                     # must be callable
                     "func": typicality_avg,
-                    "args": {"J": {"similarity": jaccard}, "SMC": {"similarity": smc}, "R": {"similarity": russell_rao}},
+                    "args": {
+                        "J": {"similarity": jaccard},
+                        "SMC": {"similarity": smc},
+                        "R": {"similarity": russell_rao},
+                    },
                 }
             }
 
