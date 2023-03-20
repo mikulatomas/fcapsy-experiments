@@ -7,7 +7,7 @@ import plotly.graph_objects as go
 from fuzzycorr import fuzzy_correlation_factory
 from fuzzycorr.strict_orderings import lukasiewicz_strict_ordering_factory
 from fuzzycorr.t_norms import godel
-from scipy.stats import kendalltau, pearsonr
+from scipy.stats import kendalltau, pearsonr, spearmanr
 
 from fcapsy_experiments._styles import css, css_corr
 
@@ -18,15 +18,15 @@ class Correlation:
 
         Args:
             source (pd.DataFrame): source data
-            type (str): type of correlation ("kendall", "pearson", "fuzzy")
+            type (str): type of correlation ("kendall", "pearson", "spearmanr", "fuzzy")
         """
         self.type = type
         self.corr, self.p_values = self._init(self, source)
 
     @staticmethod
     def _init(inst, source):
-        if inst.type in ["kendall", "pearson"]:
-            funcs = {"kendall": kendalltau, "pearson": pearsonr}
+        if inst.type in ["kendall", "pearson", "spearmanr"]:
+            funcs = {"kendall": kendalltau, "pearson": pearsonr, "spearmanr": spearmanr}
             corr = funcs[inst.type]
 
             return source.corr(lambda x, y: corr(x, y)[0]), source.corr(
@@ -117,6 +117,7 @@ class CorrelationTable:
 
         self._kendall = None
         self._pearson = None
+        self._spearmanr = None
         self._fuzzy = None
 
     @property
@@ -134,6 +135,14 @@ class CorrelationTable:
             self._pearson = Correlation(self.source, "pearson")
 
         return self._pearson
+    
+    @property
+    def spearmanr(self) -> "Correlation":
+        """Returns spearmanr correlation table."""
+        if self._spearmanr is None:
+            self._spearmanr = Correlation(self.source, "spearmanr")
+
+        return self._spearmanr
 
     @property
     def fuzzy(self) -> "Correlation":

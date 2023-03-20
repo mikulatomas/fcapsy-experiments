@@ -1,3 +1,6 @@
 from .concept_typicality import ConceptTypicality
 from .top_r_similarity import TopRSimilarity
 from .top_bottom_r_similarity import TopBottomRSimilarity
+from .top_r_intersection import TopRIntersection
+from .top_bottom_r_intersection import TopBottomRIntersection
+from .r_order_comparison import ROrderComparison

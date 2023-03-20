@@ -5,6 +5,7 @@ import plotly.graph_objects as go
 
 from sklearn.preprocessing import MinMaxScaler
 from fcapsy.typicality import typicality_avg
+from fcapsy.utils import get_context
 from binsdpy.similarity import jaccard, smc, russell_rao
 
 from fcapsy_experiments._styles import css, css_typ
@@ -20,6 +21,7 @@ class ConceptTypicality:
         count: bool = False,
         extra_columns: dict[str, "pd.Series"] = None,
         typicality_functions: dict[str, dict] = None,
+        round = None
     ) -> None:
         """Calculates typiclity for given concept
 
@@ -46,7 +48,8 @@ class ConceptTypicality:
             }
 
         self._concept = concept
-        context = self._concept.lattice._context
+        context = get_context(concept)
+
 
         if axis == 0:
             self._items_domain = context.objects
@@ -61,14 +64,14 @@ class ConceptTypicality:
 
         self.axis = axis
 
-        self.df = self._init(concept, count, typicality_functions, extra_columns)
+        self.df = self._init(concept, count, typicality_functions, extra_columns, round)
 
         if extra_columns:
             extra_columns = list(extra_columns.keys())
 
         self.extra_columns = extra_columns
 
-    def _init(self, concept, count, typicality_functions, extra_columns):
+    def _init(self, concept, count, typicality_functions, extra_columns, round):
         columns = []
 
         for name, typicality in typicality_functions.items():
@@ -89,6 +92,7 @@ class ConceptTypicality:
 
                 if args:
                     for _, arg in typicality["args"].items():
+                        print(arg)
                         row.append(function(item, concept, **arg))
                 else:
                     row.append(function(item, concept))
@@ -109,15 +113,13 @@ class ConceptTypicality:
         if extra_columns:
             for name, values in extra_columns.items():
                 df[name] = values
+        
+        if round:
+            df = df.round(round)
 
         return df
 
-    def to_html(self) -> str:
-        """Generates html table.
-
-        Returns:
-            str: html output
-        """
+    def to_df_order(self) -> pd.DataFrame:
         final_table = pd.DataFrame()
 
         for column in self.df.columns:
@@ -128,7 +130,15 @@ class ConceptTypicality:
             final_table[f"{column} order"] = round_and_sort.index
             final_table[column] = round_and_sort.reset_index()[column]
 
-        df = final_table.reset_index().drop("index", axis=1)
+        return final_table.reset_index().drop("index", axis=1)
+
+    def to_html(self) -> str:
+        """Generates html table.
+
+        Returns:
+            str: html output
+        """
+        df = self.to_df_order()
 
         df = df.style.format(precision=3)
         df.background_gradient(cmap="RdYlGn")

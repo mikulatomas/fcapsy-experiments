@@ -10,13 +10,9 @@ from .top_r_similarity import TopRSimilarity
 class TopBottomRSimilarity(TopRSimilarity):
     @staticmethod
     def _init(inst, to_columns):
-        r_range = range(1, len(inst._source.index))
+        r_range = range(1, len(inst._source.index) + 1)
 
         results = []
-
-        # filtered_columns = filter(
-        #     lambda c: c not in ignore_columns, inst._source.columns
-        # )
 
         columns_tuples, labels = inst._get_column_orders(
             inst._source,
@@ -46,4 +42,4 @@ class TopBottomRSimilarity(TopRSimilarity):
                     ]
                 )
 
-        return pd.DataFrame(results, columns=["r", "top_bottom_r_similarity", "label"])
+        return pd.DataFrame(results, columns=["r", "top_bottom_r_similarity", "label", "a", "b"])

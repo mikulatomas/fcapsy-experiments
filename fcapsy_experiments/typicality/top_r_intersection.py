@@ -3,48 +3,24 @@ import typing
 import pandas as pd
 import plotly.express as px
 
-from statistics import mean
-from itertools import combinations
-from binsdpy.similarity import jaccard
 
-
-class TopRSimilarity:
+class TopRIntersection:
     def __init__(
         self,
         source: "pd.DataFrame",
         context: "concepts.Context",
-        similarity: typing.Callable = jaccard,
         to_columns: typing.Optional[typing.List[str]] = None,
+        specific_r: typing.Optional[int] = None,
+        percentage: bool = False
     ) -> None:
-        """Calculates TopR similarities for given dataframe.
-
-        Args:
-            source (pd.DataFrame): source data (usually objects ordered by multiple metrics)
-            context (concepts.Context): source formal context
-            similarity (typing.Callable, optional): similarity which should be used. Defaults to jaccard.
-            to_columns (typing.List[str], optional): which columns to compare every other from source dataframe. Defaults to None (means all).
-        """
         if to_columns is None:
             to_columns = source.columns
 
-        self._similarity = similarity
         self._source = source
         self._context = context
-        self.df = self._init(self, to_columns)
-
-    @staticmethod
-    def _r_values_or_until_differs(iterator, r):
-        max_idx = len(iterator) - 1
-
-        if r == 0:
-            return []
-
-        for idx in range(len(iterator)):
-            if idx + 1 < r or (idx < max_idx and iterator[idx] == iterator[idx + 1]):
-                yield iterator[idx]
-            else:
-                yield iterator[idx]
-                break
+        self.percentage = percentage
+        self.specific_r = specific_r
+        self.df = self._init(self, to_columns, self.percentage, self.specific_r)
 
     @staticmethod
     def _get_column_orders(df, tuples):
@@ -70,42 +46,17 @@ class TopRSimilarity:
         return results, labels, a, b
 
     @staticmethod
-    def _top_r_similarity(context, similarity, metric_1_order, metric_2_order, r):
-        def _get_vectors(context, items):
-            try:
-                label_domain = context._extents
-                vectors = tuple(
-                    map(label_domain.__getitem__, map(context.properties.index, items))
-                )
-            except ValueError:
-                label_domain = context._intents
-                vectors = tuple(
-                    map(label_domain.__getitem__, map(context.objects.index, items))
-                )
-            return vectors
-
-        vectors_1 = _get_vectors(
-            context, list(TopRSimilarity._r_values_or_until_differs(metric_1_order, r))
-        )
-        vectors_2 = _get_vectors(
-            context, list(TopRSimilarity._r_values_or_until_differs(metric_2_order, r))
-        )
-
-        i1 = mean((max((similarity(b1, b2) for b2 in vectors_1)) for b1 in vectors_2))
-
-        i2 = mean((max((similarity(b1, b2) for b2 in vectors_2)) for b1 in vectors_1))
-
-        return min(i1, i2)
+    def _top_r_intersection(metric_1_order, metric_2_order, r):
+        return len(set(metric_1_order[:r]).intersection(set(metric_2_order[:r])))
 
     @staticmethod
-    def _init(inst, to_columns):
+    def _init(inst, to_columns, percentage, specific_r):
         r_range = range(1, len(inst._source.index) + 1)
 
-        results = []
+        if specific_r:
+            r_range = range(specific_r, specific_r + 1)
 
-        # filtered_columns = filter(
-        #     lambda c: c not in ignore_columns, inst._source.columns
-        # )
+        results = []
 
         columns_tuples, labels, a, b = inst._get_column_orders(
             inst._source,
@@ -114,23 +65,24 @@ class TopRSimilarity:
 
         for (column1_order, column2_order), label, a_, b_ in zip(columns_tuples, labels, a, b):
             for r in r_range:
+                intersection_size = inst._top_r_intersection(column1_order, column2_order, r)
+
+                if percentage:
+                    intersection_size = intersection_size / r
+
                 results.append(
                     [
                         r,
-                        inst._top_r_similarity(
-                            inst._context,
-                            inst._similarity,
-                            column1_order,
-                            column2_order,
-                            r,
-                        ),
+                        intersection_size,
                         label,
                         a_,
                         b_,
                     ]
                 )
 
-        return pd.DataFrame(results, columns=["r", "top_r_similarity", "label", "a", "b"])
+        return pd.DataFrame(
+            results, columns=["r", "top_r_intersection", "label", "a", "b"]
+        )
 
     def to_plotly(self) -> "go.Figure":
         """Generates plotly figure.
@@ -167,7 +119,7 @@ class TopRSimilarity:
                 title="S",
                 mirror=True,
                 ticks="inside",
-                range=[0, 1],
+                # range=[0, 1],
                 showline=True,
                 linecolor="black",
                 linewidth=1,
